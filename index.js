@@ -3,13 +3,23 @@ const sox = require('sox.js');
 const fs = require('fs');
 const path = require('path');
 
+
+
 /**
- *  1. Organize Audio Objects
- *  - Commands: [jab, cross, hook, uppercut, slip, praise, freestyle]
- *  - Praises
- *  - Background Music 
- *  
- */
+|--------------------------------------------------------------------------
+| 1. Declare Global Vars
+|--------------------------------------------------------------------------
+|
+|  - Organize Audio Objects
+|  - Commands: [jab, cross, hook, uppercut, slip, praise, freestyle]
+|  - Praises
+|  - Background Music 
+|  - Command Data 
+|  - Combination Data 
+|  - Freestyle Data
+|
+*/
+
 
 // Commands 
     commands = {
@@ -73,15 +83,55 @@ const path = require('path');
 // BG Music
     global.bgMusic = path.join(__dirname, 'audio/music/level-music/level-music.mp3');
 
+    /**
+     * @type {object} commandData - Stores information about commands
+     * 
+     * @property {number} count - Number of commands to return
+     * @property {string} break - length of break corresponding to key of breaks object
+     */
+    let commandData = {
+        count: 30,
+        break: 'seventh_sec'
+    };
 
-/**
- * 2. Load Audio from directories
- * 
- * @param {string} name - Name of audio list
- * @param {object} audioList - Object to populate with audio files
- * 
- * @return {void}
- */
+    /**
+     * @type {object} combinationData - Stores information about combinations
+     * 
+     * @property {number} count - Number of combinations to return
+     * @property {string} break - length of break corresponding to key of breaks object
+     */
+    let combinationData = {
+        count: 30,
+        break: 'one_point_two_sec'
+    }
+
+    /**
+     * @type {object} freestyleData - Stores information about freestyles
+     * 
+     * @property {number} time - Number of combinations to return
+     * @property {number} praiseCount - Number of praises to return
+     */
+
+    let freestyleData = {
+        time: 30,
+        praiseCount: 10
+    }
+
+
+
+
+
+/** 
+|--------------------------------------------------------------------------
+|  2. loadAudio() | Load Audio from directories
+|--------------------------------------------------------------------------
+|
+| @param {string} name - Name of audio list
+| @param {object} audioList - Object to populate with audio files
+| 
+| @return {void}
+|
+*/
 
     function loadAudio(name, audioList) {
         // Loop through command directories
@@ -122,12 +172,28 @@ const path = require('path');
 
 
 
+/** 
+|--------------------------------------------------------------------------
+|  3. generateLevel() | Generates a game level from audio
+|--------------------------------------------------------------------------
+| - Max of 3 Minutes
+|
+| @param {object} commandData - Information about commands (i.e. jab, punch, hook etc.)
+| @param {object} combinationData - Information about combinatinos 
+| @param {object} freestyleData - Contains information about the freestyle
+| 
+| @return {void}
+|
+*/
 
-/**
- * 3. Combine Audio
- * - Max of 3 Minutes
- * 
- */
+    // Prepare Data for Generator
+
+
+    function generateLevel(commandData, combinationData, freestyleData) {
+
+    }
+    generateLevel();
+
 
     sox({
         
