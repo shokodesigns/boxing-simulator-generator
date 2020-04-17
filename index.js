@@ -193,25 +193,25 @@ const path = require('path');
     }
 
 
-    function generateCommandSection(commandData) {
+    function generateSection(data, voices) {
 
         /* (Commands)
             - Return randomized array of commands w/ sizeOf commandData.count
             - Return break URL for commands
         */
 
-        let commandCount = commandData.count;
-        let commandBreak = breaks[commandData.break];
+        let commandCount = data.count;
+        let commandBreak = breaks[data.break];
         let commandArray = [];
 
         // Get Random Command
         for(let i = 0; i < commandCount; i++) {
             // Return Random Command Array
-            function randomCommand(commands) {
+            function randomCommand(voices) {
                 // Get Object Keys of parent Commands Object
-                var keys = Object.keys(commands);
+                var keys = Object.keys(voices);
                 var randomNum = keys.length * Math.random() << 0;
-                var currentCommandObject = commands[keys[ randomNum ]];
+                var currentCommandObject = voices[keys[ randomNum ]];
 
                 // Get Object Keys of current Command
                 var commandKey = Object.keys(currentCommandObject);
@@ -224,7 +224,7 @@ const path = require('path');
             };
 
             // Push random command to array
-            var currentCommand = randomCommand(commands);
+            var currentCommand = randomCommand(voices);
             commandArray.push(currentCommand);
 
             // Push pause to command array
@@ -249,9 +249,20 @@ const path = require('path');
         */
 
     }
-    var commandSection = generateCommandSection(commandData);
-    console.log(commandSection);
 
+
+/**
+ * 4. Generate & Combine Level Combinations
+ * 
+ */
+
+    let sections = [];
+    let commandSection = generateSection(commandData, commands);
+    let combinationSection = generateSection(combinationData, combos);
+
+    let combinedSections = sections.concat(commandSection, combinationSection);
+
+    console.log(combinationSection);
 
     sox({
     
@@ -259,7 +270,7 @@ const path = require('path');
         global: {
             combine: 'concatenate'
         },
-        inputFile: commandSection,
+        inputFile: combinedSections,
         output: {
             bits: 16,
             rate: 44100,
@@ -275,11 +286,6 @@ const path = require('path');
 
     });
 
-
-/**
- * 4. Export Combined Audio
- * 
- */
 
 
 /**
