@@ -97,7 +97,7 @@ const path = require('path');
     }
 
 // BG Music
-    global.bgMusic = path.join(__dirname, 'audio/music/level-music/level-music.mp3');
+    global.bgMusic = path.join(__dirname, 'audio/music/level-music/level-music-quiet.mp3');
 
 // FX
     global.bell         = path.join(__dirname, 'audio/bell/bell-short-2.wav');
@@ -179,7 +179,7 @@ const path = require('path');
      * @property {string} break - length of break corresponding to key of breaks object
      */
     let commandData = {
-        count: 50,
+        count: 55,
         break: 'seventh_sec'
     };
 
@@ -190,7 +190,7 @@ const path = require('path');
      * @property {string} break - length of break corresponding to key of breaks object
      */
     let combinationData = {
-        count: 22,
+        count: 18,
         break: 'one_point_two_sec'
     }
 
@@ -338,7 +338,7 @@ const path = require('path');
         
         soxPath: 'C:\\sox\\sox.exe',
         global: {
-            combine: 'merge'
+            combine: 'mix-power'
         },
         inputFile: ['levels/result.mp3', bgMusic],
         output: {
