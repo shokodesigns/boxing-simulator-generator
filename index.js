@@ -68,6 +68,15 @@ const path = require('path');
     };
     combos = loadAudio('combos', combos);
 
+// Freestyles
+    freestyles = {
+        general: {
+            dir: path.join(__dirname, 'audio/freestyle'),
+            sounds: []
+        }
+    }
+    freestyles = loadAudio('freestyles', freestyles);
+
 // Praises
     praises = {
         general: {
@@ -79,15 +88,20 @@ const path = require('path');
 
 // Silent Breaks (NOTE: No need to sort)
     breaks = {
-        half_sec: path.join(__dirname, 'silence/half-sec.wav'),
-        one_point_two_sec: path.join(__dirname, 'silence/1-2-sec.wav'),
-        one_sec: path.join(__dirname, 'silence/1-sec.wav'),
-        seventh_sec: path.join(__dirname, 'silence/70-sec.wav')
+        half_sec: path.join(__dirname, 'silence/half-sec.wav'), // 0.5s
+        one_point_two_sec: path.join(__dirname, 'silence/1-2-sec.wav'), // 1.2s
+        one_sec: path.join(__dirname, 'silence/1-sec.wav'), // 1s
+        seventh_sec: path.join(__dirname, 'silence/70-sec.wav'), // 0.7s
+        five_sec: path.join(__dirname, 'silence/5-sec.wav'), // 0.7s
+        seven_sec: path.join(__dirname, 'silence/7-sec.wav') // 7s
     }
 
 // BG Music
     global.bgMusic = path.join(__dirname, 'audio/music/level-music/level-music.mp3');
 
+// FX
+    global.bell         = path.join(__dirname, 'audio/bell/bell-short-2.wav');
+    global.short_break  = path.join(__dirname, 'silence/1-2-sec.wav');
 
 
 
@@ -176,20 +190,32 @@ const path = require('path');
      * @property {string} break - length of break corresponding to key of breaks object
      */
     let combinationData = {
-        count: 20,
+        count: 22,
         break: 'one_point_two_sec'
     }
 
     /**
-     * @type {object} freestyleData - Stores information about freestyles
+     * @type {object} freestyleData - Stores information about freestyle command
      * 
-     * @property {number} time - Number of combinations to return
-     * @property {number} praiseCount - Number of praises to return
+     * @property {number} count - Number of freestyle commands to return
+     * @property {string} break - length of break corresponding to key of breaks object
      */
 
     let freestyleData = {
-        time: 30,
-        praiseCount: 10
+        count: 1,
+        break: 'half_sec'
+    }
+
+    /**
+     * @type {object} praiseData - Stores information about praises
+     * 
+     * @property {number} count - Number of praises to return
+     * @property {string} break - length of break corresponding to key of breaks object
+     */
+
+    let praiseData = {
+        count: 10,
+        break: 'five_sec'
     }
 
 
@@ -259,32 +285,16 @@ const path = require('path');
     let sections = [];
     let commandSection = generateSection(commandData, commands);
     let combinationSection = generateSection(combinationData, combos);
+    let freestyleSection = generateSection(freestyleData, freestyles);
+    let praiseSection = generateSection(praiseData, praises);
 
-    let combinedSections = sections.concat(commandSection, combinationSection);
+    // Combine all sectinos
 
-    console.log(combinationSection);
-
-    sox({
-    
-        soxPath: 'C:\\sox\\sox.exe',
-        global: {
-            combine: 'concatenate'
-        },
-        inputFile: combinedSections,
-        output: {
-            bits: 16,
-            rate: 44100,
-            channels: 2
-        },
-        outputFile: 'result.wav',
-        effects: ['tempo', 1.2]
-
-    }, function done(err, outputFilePath) {
-
-        console.log(err) // => null
-        console.log(outputFilePath) // => song.wav
-
-    });
+    // Add Bell
+    sections.push(bell); // Start Bell
+    sections.push(short_break); // Short Pause
+    let combinedSections = sections.concat(commandSection, combinationSection, freestyleSection, praiseSection);
+    combinedSections.push(bell); // End Bell
 
 
 
@@ -293,4 +303,57 @@ const path = require('path');
  * 
  *  
  */ 
+
+    var numberOfRounds = 100;
+
+    for(var i = 0; i < numberOfRounds; i++) {
+
+    }
+
+    // Generate Level
+    // sox({
+        
+    //     soxPath: 'C:\\sox\\sox.exe',
+    //     global: {
+    //         combine: 'concatenate'
+    //     },
+    //     inputFile: combinedSections,
+    //     output: {
+    //         bits: 16,
+    //         rate: 44100,
+    //         channels: 2
+    //     },
+    //     outputFile: 'levels/result.mp3',
+    //     effects: ['tempo', 1.2]
+
+    // }, function done(err, outputFilePath) {
+
+    //     console.log(err) // => null
+    //     console.log(outputFilePath) // => song.wav
+
+    // });
+
+    // Combine Generated Level w/ background music
+    sox({
+        
+        soxPath: 'C:\\sox\\sox.exe',
+        global: {
+            combine: 'merge'
+        },
+        inputFile: ['levels/result.mp3', bgMusic],
+        output: {
+            bits: 16,
+            rate: 44100,
+            channels: 2
+        },
+        outputFile: 'levels/result1.mp3'
+        // effects: ['tempo', 1.2]
+
+    }, function done(err, outputFilePath) {
+
+        console.log(err) // => null
+        console.log(outputFilePath) // => song.wav
+
+    });
+
 
