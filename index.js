@@ -28,12 +28,20 @@ const path = require('path');
             dir: path.join(__dirname, 'audio/cross/'),
             sounds: []
         },
-        hooks:    {
-            dir: path.join(__dirname, 'audio/hook/'),
+        right_hooks:    {
+            dir: path.join(__dirname, 'audio/right-hook/'),
             sounds: []
         },
-        uppercuts: {
-            dir: path.join(__dirname, 'audio/uppercut/'),
+        left_hooks:    {
+            dir: path.join(__dirname, 'audio/left-hook/'),
+            sounds: []
+        },
+        right_uppercuts: {
+            dir: path.join(__dirname, 'audio/right-uppercut/'),
+            sounds: []
+        },
+        left_uppercuts: {
+            dir: path.join(__dirname, 'audio/left-uppercut/'),
             sounds: []
         },
         slips: {
@@ -71,10 +79,10 @@ const path = require('path');
 
 // Silent Breaks (NOTE: No need to sort)
     breaks = {
-        half_sec: path.join(__dirname, 'half-sec.mp3'),
-        one_point_two_sec: path.join(__dirname, '1-2-sec.mp3'),
-        one_sec: path.join(__dirname, '1-sec.mp3'),
-        seventh_sec: path.join(__dirname, '70-sec.mp3')
+        half_sec: path.join(__dirname, 'silence/half-sec.wav'),
+        one_point_two_sec: path.join(__dirname, 'silence/1-2-sec.wav'),
+        one_sec: path.join(__dirname, 'silence/1-sec.wav'),
+        seventh_sec: path.join(__dirname, 'silence/70-sec.wav')
     }
 
 // BG Music
@@ -111,24 +119,6 @@ const path = require('path');
                 return tempList;
             }
 
-            // Read files in directory
-            // var updatedList = fs.readdirSync(dir, function (err, files) {
-            //     var tempArray   = [];
-
-            //     if (err) {
-            //         return console.log('Unable to scan directory: ' + err);
-            //     } 
-            //     files.forEach(function (file) {
-            //         // Add sounds to temporary array
-            //         var tempFile = path.resolve(file);
-            //         tempArray.push(tempFile);
-            //     });
-
-            //     var processedData = processData(tempArray);
-            //     return processedData;
-            // });
-
-
             function traverseDir(dir) {
                 var tempArray   = [];
 
@@ -154,7 +144,7 @@ const path = require('path');
 
 /** 
 |--------------------------------------------------------------------------
-|  3. generateLevel() | Generates a game level from audio
+|  3. generateCommandSection() | Generates an audio section from commands
 |--------------------------------------------------------------------------
 | - Max of 3 Minutes
 |
@@ -175,7 +165,7 @@ const path = require('path');
      * @property {string} break - length of break corresponding to key of breaks object
      */
     let commandData = {
-        count: 30,
+        count: 50,
         break: 'seventh_sec'
     };
 
@@ -203,7 +193,7 @@ const path = require('path');
     }
 
 
-    function generateLevel(commandData, combinationData, freestyleData) {
+    function generateCommandSection(commandData) {
 
         /* (Commands)
             - Return randomized array of commands w/ sizeOf commandData.count
@@ -243,7 +233,7 @@ const path = require('path');
         }
 
         // Success! Returns list of random commands along with corresponding pauses
-        console.log(commandArray);
+        return commandArray;
 
 
         
@@ -258,34 +248,32 @@ const path = require('path');
 
         */
 
-
-
-        // sox({
-        
-        //     soxPath: 'C:\\sox\\sox.exe',
-        //     global: {
-        //         combine: 'merge'
-        //     },
-        //     inputFile: ['jab1.wav','jab1.wav','cross1.wav'],
-        //     output: {
-        //         bits: 16,
-        //         rate: 44100,
-        //         channels: 2
-        //     },
-        //     outputFile: 'result.wav',
-        //     effects: ['tempo', 1.2]
-    
-        // }, function done(err, outputFilePath) {
-    
-        //     console.log(err) // => null
-        //     console.log(outputFilePath) // => song.wav
-    
-        // });
-
     }
-    generateLevel(commandData, combinationData, freestyleData);
+    var commandSection = generateCommandSection(commandData);
+    console.log(commandSection);
 
 
+    sox({
+    
+        soxPath: 'C:\\sox\\sox.exe',
+        global: {
+            combine: 'concatenate'
+        },
+        inputFile: commandSection,
+        output: {
+            bits: 16,
+            rate: 44100,
+            channels: 2
+        },
+        outputFile: 'result.wav',
+        effects: ['tempo', 1.2]
+
+    }, function done(err, outputFilePath) {
+
+        console.log(err) // => null
+        console.log(outputFilePath) // => song.wav
+
+    });
 
 
 /**
