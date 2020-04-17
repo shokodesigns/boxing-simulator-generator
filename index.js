@@ -14,9 +14,6 @@ const path = require('path');
 |  - Commands: [jab, cross, hook, uppercut, slip, praise, freestyle]
 |  - Praises
 |  - Background Music 
-|  - Command Data 
-|  - Combination Data 
-|  - Freestyle Data
 |
 */
 
@@ -83,39 +80,6 @@ const path = require('path');
 // BG Music
     global.bgMusic = path.join(__dirname, 'audio/music/level-music/level-music.mp3');
 
-    /**
-     * @type {object} commandData - Stores information about commands
-     * 
-     * @property {number} count - Number of commands to return
-     * @property {string} break - length of break corresponding to key of breaks object
-     */
-    let commandData = {
-        count: 30,
-        break: 'seventh_sec'
-    };
-
-    /**
-     * @type {object} combinationData - Stores information about combinations
-     * 
-     * @property {number} count - Number of combinations to return
-     * @property {string} break - length of break corresponding to key of breaks object
-     */
-    let combinationData = {
-        count: 30,
-        break: 'one_point_two_sec'
-    }
-
-    /**
-     * @type {object} freestyleData - Stores information about freestyles
-     * 
-     * @property {number} time - Number of combinations to return
-     * @property {number} praiseCount - Number of praises to return
-     */
-
-    let freestyleData = {
-        time: 30,
-        praiseCount: 10
-    }
 
 
 
@@ -148,20 +112,36 @@ const path = require('path');
             }
 
             // Read files in directory
-            var updatedList = fs.readdirSync(dir, function (err, files) {
+            // var updatedList = fs.readdirSync(dir, function (err, files) {
+            //     var tempArray   = [];
+
+            //     if (err) {
+            //         return console.log('Unable to scan directory: ' + err);
+            //     } 
+            //     files.forEach(function (file) {
+            //         // Add sounds to temporary array
+            //         var tempFile = path.resolve(file);
+            //         tempArray.push(tempFile);
+            //     });
+
+            //     var processedData = processData(tempArray);
+            //     return processedData;
+            // });
+
+
+            function traverseDir(dir) {
                 var tempArray   = [];
 
-                if (err) {
-                    return console.log('Unable to scan directory: ' + err);
-                } 
-                files.forEach(function (file) {
-                    // Add sounds to temporary array
-                    tempArray.push(file);
+                fs.readdirSync(dir).forEach(file => {
+                    let tempFile = path.join(dir, file);
+                    tempArray.push(tempFile);
                 });
 
                 var processedData = processData(tempArray);
                 return processedData;
-            });
+            }
+
+            var updatedList = traverseDir(dir);
             return updatedList;
 
         });
@@ -182,41 +162,128 @@ const path = require('path');
 | @param {object} combinationData - Information about combinatinos 
 | @param {object} freestyleData - Contains information about the freestyle
 | 
-| @return {void}
+| @return {string} levelUrl - Return URL to file for generated level
 |
 */
 
     // Prepare Data for Generator
 
+    /**
+     * @type {object} commandData - Stores information about commands
+     * 
+     * @property {number} count - Number of commands to return
+     * @property {string} break - length of break corresponding to key of breaks object
+     */
+    let commandData = {
+        count: 30,
+        break: 'seventh_sec'
+    };
+
+    /**
+     * @type {object} combinationData - Stores information about combinations
+     * 
+     * @property {number} count - Number of combinations to return
+     * @property {string} break - length of break corresponding to key of breaks object
+     */
+    let combinationData = {
+        count: 20,
+        break: 'one_point_two_sec'
+    }
+
+    /**
+     * @type {object} freestyleData - Stores information about freestyles
+     * 
+     * @property {number} time - Number of combinations to return
+     * @property {number} praiseCount - Number of praises to return
+     */
+
+    let freestyleData = {
+        time: 30,
+        praiseCount: 10
+    }
+
 
     function generateLevel(commandData, combinationData, freestyleData) {
 
-    }
-    generateLevel();
+        /* (Commands)
+            - Return randomized array of commands w/ sizeOf commandData.count
+            - Return break URL for commands
+        */
+
+        let commandCount = commandData.count;
+        let commandBreak = breaks[commandData.break];
+        let commandArray = [];
+
+        // Get Random Command
+        for(let i = 0; i < commandCount; i++) {
+            // Return Random Command Array
+            function randomCommand(commands) {
+                // Get Object Keys of parent Commands Object
+                var keys = Object.keys(commands);
+                var randomNum = keys.length * Math.random() << 0;
+                var currentCommandObject = commands[keys[ randomNum ]];
+
+                // Get Object Keys of current Command
+                var commandKey = Object.keys(currentCommandObject);
+                var randomNum2 = commandKey.length * Math.random() << 0;
+                currentCommandArray = currentCommandObject[commandKey[ randomNum2 ]].sounds;
+
+                // Return Random Single Command
+                var currentCommand = currentCommandArray[Math.floor(Math.random() * currentCommandArray.length)];
+                return currentCommand;
+            };
+
+            // Push random command to array
+            var currentCommand = randomCommand(commands);
+            commandArray.push(currentCommand);
+
+            // Push pause to command array
+            commandArray.push(commandBreak);
+            
+        }
+
+        // Success! Returns list of random commands along with corresponding pauses
+        console.log(commandArray);
 
 
-    sox({
         
-        soxPath: 'C:\\sox\\sox.exe',
-        global: {
-            combine: 'merge'
-        },
-        inputFile: ['jab1.wav','jab1.wav','cross1.wav'],
-        output: {
-            bits: 16,
-            rate: 44100,
-            channels: 2
-        },
-        outputFile: 'result.wav',
-        effects: ['tempo', 1.2]
 
-    }, function done(err, outputFilePath) {
+        /* TODO: (Combinations)
+            - Return randomized array of combinations w/ sizeOf combinationData.count
+            - Return break URL for combinations
 
-        console.log(err) // => null
-        console.log(outputFilePath) // => song.wav
+        */
 
-    });
+        /* TODO: (Freestyle)
 
+        */
+
+
+
+        // sox({
+        
+        //     soxPath: 'C:\\sox\\sox.exe',
+        //     global: {
+        //         combine: 'merge'
+        //     },
+        //     inputFile: ['jab1.wav','jab1.wav','cross1.wav'],
+        //     output: {
+        //         bits: 16,
+        //         rate: 44100,
+        //         channels: 2
+        //     },
+        //     outputFile: 'result.wav',
+        //     effects: ['tempo', 1.2]
+    
+        // }, function done(err, outputFilePath) {
+    
+        //     console.log(err) // => null
+        //     console.log(outputFilePath) // => song.wav
+    
+        // });
+
+    }
+    generateLevel(commandData, combinationData, freestyleData);
 
 
 
