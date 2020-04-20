@@ -214,8 +214,21 @@ const path = require('path');
      */
 
     let praiseData = {
-        count: 10,
+        count: 12,
         break: 'five_sec'
+    }
+
+
+    /**
+     * Shuffles array in place. ES6 version
+     * @param {Array} a items An array containing the items.
+     */
+    function shuffle(a) {
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
     }
 
 
@@ -234,15 +247,30 @@ const path = require('path');
         for(let i = 0; i < commandCount; i++) {
             // Return Random Command Array
             function randomCommand(voices) {
+
+                var commandArray         = Object.keys(voices);
+                    commandArray         = shuffle(commandArray);
+                var randomNumber         = Math.random();
+                var commandIndex         = Math.floor(randomNumber * commandArray.length);
+                var currentCommandObject = voices[commandArray[ commandIndex ]];
+
                 // Get Object Keys of parent Commands Object
-                var keys = Object.keys(voices);
-                var randomNum = keys.length * Math.random() << 0;
-                var currentCommandObject = voices[keys[ randomNum ]];
+                // var keys = Object.keys(voices);
+                // var randomNum = keys.length * Math.random() << 0;
+                // var currentCommandObject = voices[keys[ randomNum ]];
 
                 // Get Object Keys of current Command
-                var commandKey = Object.keys(currentCommandObject);
-                var randomNum2 = commandKey.length * Math.random() << 0;
-                currentCommandArray = currentCommandObject[commandKey[ randomNum2 ]].sounds;
+                var commandKey      = Object.keys(currentCommandObject);
+                var randomNum2      = Math.random();
+                var randomIndex2    = Math.floor(randomNum2 * commandKey.length);
+                currentCommandArray = currentCommandObject[commandKey[ randomIndex2 ]].sounds;
+                
+                console.log(currentCommandArray);
+                // // Get Object Keys of current Command
+                // var commandKey      = Object.keys(currentCommandObject);
+                // var randomNum2      = commandKey.length * Math.random() << 0;
+                // currentCommandArray = currentCommandObject[commandKey[ randomNum2 ]].sounds;
+
 
                 // Return Random Single Command
                 var currentCommand = currentCommandArray[Math.floor(Math.random() * currentCommandArray.length)];
@@ -261,19 +289,6 @@ const path = require('path');
         // Success! Returns list of random commands along with corresponding pauses
         return commandArray;
 
-
-        
-
-        /* TODO: (Combinations)
-            - Return randomized array of combinations w/ sizeOf combinationData.count
-            - Return break URL for combinations
-
-        */
-
-        /* TODO: (Freestyle)
-
-        */
-
     }
 
 
@@ -282,78 +297,90 @@ const path = require('path');
  * 
  */
 
-    let sections = [];
-    let commandSection = generateSection(commandData, commands);
-    let combinationSection = generateSection(combinationData, combos);
-    let freestyleSection = generateSection(freestyleData, freestyles);
-    let praiseSection = generateSection(praiseData, praises);
-
-    // Combine all sectinos
-
-    // Add Bell
-    sections.push(bell); // Start Bell
-    sections.push(short_break); // Short Pause
-    let combinedSections = sections.concat(commandSection, combinationSection, freestyleSection, praiseSection);
-    combinedSections.push(bell); // End Bell
-
-
 
 /**
  * 5. Loop as Needed
  * 
- *  
+ * TODO: Set up generator to work in without having to toggle
+ * between 'Generate Levels' & 'Combine Levels'
  */ 
 
-    var numberOfRounds = 100;
+    var numberOfRounds = 10;
 
+    // Generate Levels
     for(var i = 0; i < numberOfRounds; i++) {
+
+
+        let sections = [];
+        let commandSection = generateSection(commandData, commands);
+        let combinationSection = generateSection(combinationData, combos);
+        let freestyleSection = generateSection(freestyleData, freestyles);
+        let praiseSection = generateSection(praiseData, praises);
+    
+        // Combine all sectinos
+    
+        // Add Bell
+        sections.push(bell); // Start Bell
+        sections.push(short_break); // Short Pause
+        let combinedSections = sections.concat(commandSection, combinationSection, freestyleSection, praiseSection);
+        combinedSections.push(bell); // End Bell
+        
+
+
+        sox({
+                
+            soxPath: 'C:\\sox\\sox.exe',
+            global: {
+                combine: 'concatenate'
+            },
+            inputFile: combinedSections,
+            output: {
+                bits: 16,
+                rate: 44100,
+                channels: 2
+            },
+            outputFile: 'levels/result' + i + '.wav',
+            effects: ['tempo', 1.2]
+
+        }, function done(err, outputFilePath) {
+
+            console.log(err) // => null
+            console.log(outputFilePath) // => song.wav
+
+        });
 
     }
 
-    // Generate Level
-    // sox({
-        
-    //     soxPath: 'C:\\sox\\sox.exe',
-    //     global: {
-    //         combine: 'concatenate'
-    //     },
-    //     inputFile: combinedSections,
-    //     output: {
-    //         bits: 16,
-    //         rate: 44100,
-    //         channels: 2
-    //     },
-    //     outputFile: 'levels/result.mp3',
-    //     effects: ['tempo', 1.2]
 
-    // }, function done(err, outputFilePath) {
-
-    //     console.log(err) // => null
-    //     console.log(outputFilePath) // => song.wav
-
-    // });
 
     // Combine Generated Level w/ background music
-    sox({
-        
-        soxPath: 'C:\\sox\\sox.exe',
-        global: {
-            combine: 'mix-power'
-        },
-        inputFile: ['levels/result.mp3', bgMusic],
-        output: {
-            bits: 16,
-            rate: 44100,
-            channels: 2
-        },
-        outputFile: 'levels/result1.mp3'
-        // effects: ['tempo', 1.2]
+    // for(var i = 50; i < numberOfRounds; i++) {
 
-    }, function done(err, outputFilePath) {
+    //     sox({
+            
+    //         soxPath: 'C:\\sox\\sox.exe',
+    //         global: {
+    //             combine: 'mix-power'
+    //         },
+    //         inputFile: ['levels/result' + i + '.wav', bgMusic],
+    //         output: {
+    //             bits: 16,
+    //             rate: 44100,
+    //             channels: 2
+    //         },
+    //         outputFile: 'levels/level' + i + '.wav'
+    //         // effects: ['tempo', 1.2]
 
-        console.log(err) // => null
-        console.log(outputFilePath) // => song.wav
+    //     }, function done(err, outputFilePath) {
 
-    });
+    //         console.log(err) // => null
+    //         console.log(outputFilePath) // => song.wav
+
+    //     });
+    // }
+    
+
+
+    
 
 
