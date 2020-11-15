@@ -2,6 +2,71 @@
 const sox = require('sox.js');
 const fs = require('fs');
 const path = require('path');
+const yargs = require('yargs');
+const { hideBin } = require('yargs/helpers');
+
+// Node arguments
+const argv          = yargs(hideBin(process.argv)).argv;
+let difficultyArg   = 1; // Default to 1 difficulty ...
+let roundsCountArg  = 1; // Default to 1 round ...
+
+// Set Diffifulty ...
+if(argv.difficulty) {
+    difficultyArg   = argv.difficulty; // Set difficulty via command line ...
+} 
+
+// Set Rounds ...
+if(argv.rounds) {
+    roundsCountArg   = argv.rounds; // Set rounds via command line ...
+} 
+
+
+/**
+|--------------------------------------------------------------------------
+| 0. Set level defaults
+|--------------------------------------------------------------------------
+|
+|  - Organize Audio Objects
+|  - Commands: [jab, cross, hook, uppercut, slip, praise, freestyle]
+|  - Praises
+|  - Background Music 
+|
+*/
+// Generate level count from difficulty
+let commandsCount,
+    combosCount,
+    freestyleCount,
+    praiseCount;
+
+switch(difficultyArg) {
+    case 1:
+        commandsCount   = 132,
+        combosCount     = 0,
+        freestyleCount  = 0,
+        praiseCount     = 0;
+        break;
+    case 2:
+
+        break;  
+    case 3:
+        commandsCount   = 55,
+        combosCount     = 18,
+        freestyleCount  = 1,
+        praiseCount     = 12;
+        break;
+    case 4:
+        
+        break;
+    case 5:
+        
+        break;
+    default:
+        commandsCount   = 55,
+        combosCount     = 18,
+        freestyleCount  = 1,
+        praiseCount     = 12;
+}
+
 
 
 
@@ -46,6 +111,38 @@ const path = require('path');
         },
         slips: {
             dir: path.join(__dirname, 'audio/slip/'),
+            sounds: []
+        },
+        feints: {
+            dir: path.join(__dirname, 'audio/feint/'),
+            sounds: []
+        },
+        pivots: {
+            dir: path.join(__dirname, 'audio/pivot/'),
+            sounds: []
+        },
+        pull_counters: {
+            dir: path.join(__dirname, 'audio/pull-counter/'),
+            sounds: []
+        },
+        rolls: {
+            dir: path.join(__dirname, 'audio/roll/'),
+            sounds: []
+        },
+        steps: {
+            dir: path.join(__dirname, 'audio/step/'),
+            sounds: []
+        },
+        step_lefts: {
+            dir: path.join(__dirname, 'audio/step-left/'),
+            sounds: []
+        },
+        step_rights: {
+            dir: path.join(__dirname, 'audio/step-right/'),
+            sounds: []
+        },
+        switch_stances: {
+            dir: path.join(__dirname, 'audio/switch-stance/'),
             sounds: []
         }
     };
@@ -179,9 +276,9 @@ const path = require('path');
      * @property {string} break - length of break corresponding to key of breaks object
      */
     let commandData = {
-        count: 55,
+        count: commandsCount,
         break: 'seventh_sec'
-    };
+    }; // Approx 1:15 long...
 
     /**
      * @type {object} combinationData - Stores information about combinations
@@ -190,9 +287,9 @@ const path = require('path');
      * @property {string} break - length of break corresponding to key of breaks object
      */
     let combinationData = {
-        count: 18,
+        count: combosCount,
         break: 'one_point_two_sec'
-    }
+    } // Approx 0:45 ...
 
     /**
      * @type {object} freestyleData - Stores information about freestyle command
@@ -202,9 +299,9 @@ const path = require('path');
      */
 
     let freestyleData = {
-        count: 1,
+        count: freestyleCount,
         break: 'half_sec'
-    }
+    } // Approx 1:00 ...
 
     /**
      * @type {object} praiseData - Stores information about praises
@@ -214,7 +311,7 @@ const path = require('path');
      */
 
     let praiseData = {
-        count: 12,
+        count: praiseCount,
         break: 'five_sec'
     }
 
@@ -305,7 +402,7 @@ const path = require('path');
  * between 'Generate Levels' & 'Combine Levels'
  */ 
 
-    var numberOfRounds = 10;
+    var numberOfRounds = roundsCountArg;
 
     // Generate Levels
     for(var i = 0; i < numberOfRounds; i++) {
@@ -354,7 +451,7 @@ const path = require('path');
 
 
     // Combine Generated Level w/ background music
-    // for(var i = 50; i < numberOfRounds; i++) {
+    // for(var i = 0; i < numberOfRounds; i++) {
 
     //     sox({
             
@@ -378,9 +475,6 @@ const path = require('path');
 
     //     });
     // }
-    
-
-
     
 
 
