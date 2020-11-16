@@ -2,6 +2,7 @@
 const sox = require('sox.js');
 const fs = require('fs');
 const path = require('path');
+const express = require('express');
 const yargs = require('yargs');
 const { hideBin } = require('yargs/helpers');
 
@@ -36,7 +37,8 @@ if(argv.rounds) {
 let commandsCount,
     combosCount,
     freestyleCount,
-    praiseCount;
+    praiseCount,
+    levelData;
 
 switch(difficultyArg) {
     case 1:
@@ -44,27 +46,47 @@ switch(difficultyArg) {
         combosCount     = 0,
         freestyleCount  = 0,
         praiseCount     = 0;
+        levelData       = require('./difficulty/level_one');
         break;
-    case 2:
 
+    case 2:
+        commandsCount   = 90,
+        combosCount     = 9,
+        freestyleCount  = 1,
+        praiseCount     = 12;
+        levelData       = require('./difficulty/level_two');
         break;  
+
     case 3:
         commandsCount   = 55,
         combosCount     = 18,
         freestyleCount  = 1,
         praiseCount     = 12;
+        levelData       = require('./difficulty/level_three');
         break;
+
     case 4:
-        
-        break;
-    case 5:
-        
-        break;
-    default:
-        commandsCount   = 55,
-        combosCount     = 18,
+        commandsCount   = 27,
+        combosCount     = 32,
         freestyleCount  = 1,
         praiseCount     = 12;
+        levelData       = require('./difficulty/level_four');
+        break;
+
+    case 5:
+        commandsCount   = 0,
+        combosCount     = 46,
+        freestyleCount  = 1,
+        praiseCount     = 12;
+        levelData       = require('./difficulty/level_five');
+        break;
+
+    default:
+        commandsCount   = 132,
+        combosCount     = 0,
+        freestyleCount  = 0,
+        praiseCount     = 0;
+        levelData       = require('./difficulty/level_one');
 }
 
 
@@ -83,87 +105,14 @@ switch(difficultyArg) {
 */
 
 
-// Commands 
-    commands = {
-        jabs:     {
-            dir: path.join(__dirname, 'audio/jab/'),
-            sounds: []
-        },
-        crosses:  {
-            dir: path.join(__dirname, 'audio/cross/'),
-            sounds: []
-        },
-        right_hooks:    {
-            dir: path.join(__dirname, 'audio/right-hook/'),
-            sounds: []
-        },
-        left_hooks:    {
-            dir: path.join(__dirname, 'audio/left-hook/'),
-            sounds: []
-        },
-        right_uppercuts: {
-            dir: path.join(__dirname, 'audio/right-uppercut/'),
-            sounds: []
-        },
-        left_uppercuts: {
-            dir: path.join(__dirname, 'audio/left-uppercut/'),
-            sounds: []
-        },
-        slips: {
-            dir: path.join(__dirname, 'audio/slip/'),
-            sounds: []
-        },
-        feints: {
-            dir: path.join(__dirname, 'audio/feint/'),
-            sounds: []
-        },
-        pivots: {
-            dir: path.join(__dirname, 'audio/pivot/'),
-            sounds: []
-        },
-        pull_counters: {
-            dir: path.join(__dirname, 'audio/pull-counter/'),
-            sounds: []
-        },
-        rolls: {
-            dir: path.join(__dirname, 'audio/roll/'),
-            sounds: []
-        },
-        steps: {
-            dir: path.join(__dirname, 'audio/step/'),
-            sounds: []
-        },
-        step_lefts: {
-            dir: path.join(__dirname, 'audio/step-left/'),
-            sounds: []
-        },
-        step_rights: {
-            dir: path.join(__dirname, 'audio/step-right/'),
-            sounds: []
-        },
-        switch_stances: {
-            dir: path.join(__dirname, 'audio/switch-stance/'),
-            sounds: []
-        }
-    };
+// Commands
+    let commands = levelData.commands;
     commands = loadAudio('commands', commands); // Load Audio Files to Object
 
 // Combos
-    combos = {
-        two_combos: {
-            dir: path.join(__dirname, 'combos/2-combo/'),
-            sounds: []
-        },
-        three_combos: {
-            dir: path.join(__dirname, 'combos/3-combo/'),
-            sounds: []
-        },
-        four_combos: {
-            dir: path.join(__dirname, 'combos/4-combo/'),
-            sounds: []
-        }
-    };
+    let combos = levelData.combos;
     combos = loadAudio('combos', combos);
+
 
 // Freestyles
     freestyles = {
@@ -362,7 +311,10 @@ switch(difficultyArg) {
                 var randomIndex2    = Math.floor(randomNum2 * commandKey.length);
                 currentCommandArray = currentCommandObject[commandKey[ randomIndex2 ]].sounds;
                 
-                console.log(currentCommandArray);
+                // Log files ...
+                // console.log(currentCommandArray);
+
+
                 // // Get Object Keys of current Command
                 // var commandKey      = Object.keys(currentCommandObject);
                 // var randomNum2      = commandKey.length * Math.random() << 0;
